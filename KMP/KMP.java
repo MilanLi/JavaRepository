@@ -1,3 +1,8 @@
+// KMP algorithm implementation
+
+// Find the first match substring in linear time using DFA
+
+
 package kmp.Pkg;
 
 import java.util.Hashtable;
