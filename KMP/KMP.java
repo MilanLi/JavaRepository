@@ -1,17 +1,14 @@
-// KMP algorithm implementation
+package patternMatchPkg;
 
-// Find the first match substring in linear time using DFA
-
-
-package kmp.Pkg;
-
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-public class KMP {
+public class KMP implements PatternMatch{
 	
 	private Hashtable<Character, Integer> hashtable;
 	private int[][] DFA;
+	private boolean DFAExisted;
 	private int rows;
 	private int cols;
 	private String pattern;
@@ -27,6 +24,7 @@ public class KMP {
 		cols = pattern.length();
 		ACstate = cols;
 		DFA = new int[rows][cols];
+		DFAExisted = false;
 	}
 
 	private int searchForDistinct(String s){
@@ -78,19 +76,20 @@ public class KMP {
 			getRow(ch)[curr] = curr+1;
 			
 			// update prev and curr
-			System.out.println(prev+", "+curr);
+//			System.out.println(prev+", "+curr);
 			
 			prev = getRow(ch)[prev];
 			curr++;
 		}
-		printDFA();
+		DFAExisted = true;
+//		printDFA();
 		
 	}
 	
-	private int matchWithDFA(){
+	private int matchWithDFA(int start){
 		int len = word.length();
 		int state = 0;
-		for(int i = 0; i < len; i++){
+		for(int i = start; i < len; i++){
 			char ch = word.charAt(i);
 			if(!hashtable.containsKey(ch)){
 				state = 0;
@@ -106,18 +105,33 @@ public class KMP {
 	}
 	
 	
-	public int KMPmatch(){
+	@Override
+	public int matchPattern(){
 		constructDFA();
-		return matchWithDFA();
+		return matchWithDFA(0);
 	}
 	
-	public static void main(String[] args) {
-		String patternString = "ABCDABD";
-		String wordString = "ABC ABCDAB ABCDABCDABDE";
-		KMP kmp = new KMP(patternString, wordString);
-		int startInd = kmp.KMPmatch();
-		System.out.println("start index is: "+startInd);
-
+	@Override
+	public int matchPattern(int start){
+		if(!DFAExisted){
+			constructDFA();
+		}
+		return matchWithDFA(start);
 	}
+
+	@Override
+	public ArrayList<Integer> findAllMatch() {
+		int start = 0;
+		int m;
+		ArrayList<Integer> retArrayList = new ArrayList<Integer>(); 
+		
+		while((m = matchPattern(start)) != -1){
+			retArrayList.add(m);
+			start = m+1;
+		}
+		return retArrayList;
+	}
+	
+	
 
 }
